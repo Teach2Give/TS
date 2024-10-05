@@ -1,0 +1,1 @@
+let person4: [number, string] = [23, 'John']
