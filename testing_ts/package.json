@@ -1,0 +1,30 @@
+{
+  "name": "ts",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node fundamentals/main.ts",
+    "test": "jest",
+    "build": "tsc",
+    "watch": "ts-node-dev --respawn fundamentals/main.ts"
+  },
+  "devDependencies": {
+    "@total-typescript/exercise-cli": "0.4.0",
+    "@total-typescript/helpers": "~0.0.1",
+    "@types/jest": "^29.5.14",
+    "cross-fetch": "~3.1.5",
+    "jest": "^29.7.0",
+    "nodemon": "~3.0.1",
+    "npm-run-all": "~4.1.5",
+    "prettier": "~2.8.7",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.2.2",
+    "vite-tsconfig-paths": "~4.0.7",
+    "vitest": "0.34.4"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

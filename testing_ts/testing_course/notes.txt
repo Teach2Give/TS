@@ -1,0 +1,195 @@
+https://dev.to/ghostaram/configuring-jest-for-typescript-unit-tests-4iag
+
+pnpm i -d typescript jest ts-jest @types/jest ts-node
+npm i -D jest ts-jest @types/jest @jest/globals
+
+create jest config
+npx ts-jest config:init
+
+npx tsc --init
+
+create src 
+
+
+
+jest understands a test file with .test or .spec
+
+describe() used to group different tests together 
+export function toUpperCase(arg: string) {
+    return arg.toUpperCase()
+}
+
+import { toUpperCase } from "../app/Utils"
+
+describe('Utils test suite', () => {
+    //put your test 
+    //we can use it or test function  
+    test('should return uppercase', () => {
+        const result = toUpperCase('abc');
+        //now lets make an assertions
+        expect(result).toBe('ABC')
+    })
+})
+
+
+
+how to properly structure a unit test 
+AAA principles: each test should have 3 iterations
+     - arrange
+     - act
+     - assertions
+
+ - for more complex test 
+     setup
+     TearDown  
+
+// Utils.ts
+export function toUpperCase(arg: string): string {
+    return arg.toUpperCase();
+}
+
+// Utils.test.ts
+Using it with the AAA approach simplifies the structure and allows tests to communicate their purpose in a human-readable format, making the test suite more maintainable and useful.
+import { toUpperCase } from "../app/Utils";
+
+describe('Utils test suite', () => {
+
+    it('should return uppercase', () => {
+        // Arrange: Set up any required variables or states
+        const input = 'abc';
+
+        // Act: Execute the function or method being tested
+        const result = toUpperCase(input);
+
+        // Assert: Verify the result is as expected
+        expect(result).toBe('ABC');
+    });
+
+});
+
+
+For More Complex Tests: Setup and Teardown
+For complex test scenarios that need initialization or cleanup, you can use setup and teardown functions. In Jest, this is typically done using beforeEach and afterEach.
+
+describe('Utils test suite with setup and teardown', () => {
+    
+    let input: string;
+
+    // Setup
+    beforeEach(() => {
+        input = 'complexCase';
+    });
+
+    // Teardown
+    afterEach(() => {
+        input = '';
+    });
+
+    test('should handle complex case and return uppercase', () => {
+        const result = toUpperCase(input);
+        expect(result).toBe('COMPLEXCASE');
+    });
+
+});
+
+
+
+
+//jest matchers 
+// Jest matchers are functions provided by Jest that allow you to make assertions about the values returned by your code, ensuring they meet expected conditions. Matchers help you validate everything from basic equality to more complex conditions, like testing arrays, objects, errors, or async functions.
+
+// 1. Basic Matchers
+// .toBe()
+// Checks for strict equality (===), so it’s best for primitives (numbers, strings, etc.).
+expect(5 + 5).toBe(10);
+
+
+// .toEqual()
+// Useful for checking the value equality of objects and arrays. Unlike .toBe(), it does a deep comparison.
+expect({ name: 'Alamin' }).toEqual({ name: 'Alamin' });
+
+
+// .not
+// Use .not to reverse the logic of a matcher.
+expect(5 + 5).not.toBe(11);
+
+
+// .toBeNull(), .toBeUndefined(), .toBeDefined()
+// Check for specific null, undefined, or defined values.
+expect(null).toBeNull();
+expect(undefined).toBeUndefined();
+expect("text").toBeDefined();
+
+
+// .toBeTruthy() and .toBeFalsy()
+// Check for truthiness or falsiness.
+expect(true).toBeTruthy();
+expect(false).toBeFalsy();
+
+
+
+// 2. Numbers Matchers
+// For comparing numbers with greater or less-than conditions.
+// .toBeGreaterThan(), .toBeGreaterThanOrEqual()
+expect(10).toBeGreaterThan(5);
+expect(5).toBeGreaterThanOrEqual(5);
+
+// .toBeLessThan(), .toBeLessThanOrEqual()
+expect(3).toBeLessThan(5);
+expect(5).toBeLessThanOrEqual(5);
+
+
+// .toBeCloseTo()
+// Useful for comparing floating-point numbers.
+expect(0.2 + 0.1).toBeCloseTo(0.3);
+
+
+// 3. String Matchers
+// Matchers for working with strings.
+
+// .toMatch()
+// Check if a string contains a substring or matches a regular expression.
+expect("Hello, Jest!").toMatch("Jest");
+expect("Hello, Jest!").toMatch(/jest/i);
+
+
+// 4. Array and Iterable Matchers
+// Used for arrays or other iterable collections.
+
+// .toContain()
+// Checks if an array or iterable contains a specific item.
+const fruits = ["apple", "banana", "orange"];
+expect(fruits).toContain("banana");
+
+// .toHaveLength()
+// Checks if an array, string, or iterable has a specified length.
+expect(fruits).toHaveLength(3);
+
+
+// 5. Object Matchers
+// Matchers for properties and structure in objects.
+
+// .toHaveProperty()
+// Asserts that an object contains a specific property
+const user = { name: "Alamin", age: 25 };
+expect(user).toHaveProperty("name");
+expect(user).toHaveProperty("age", 25);
+
+
+// 6. Error Matchers
+// To test if a function throws an error, use .toThrow().
+
+// .toThrow()
+// Verifies if a function throws an error, and you can optionally check the error message or pattern.
+const throwError = () => { throw new Error("Something went wrong"); };
+expect(throwError).toThrow();
+expect(throwError).toThrow("Something went wrong");
+
+
+// 7. Async Matchers
+// Matchers for asynchronous code (promises).
+
+// .resolves and .rejects
+// Use these with promises to ensure they resolve or reject as expected.
+await expect(Promise.resolve("value")).resolves.toBe("value");
+await expect(Promise.reject("error")).rejects.toBe("error");

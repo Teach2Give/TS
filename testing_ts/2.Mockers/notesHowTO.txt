@@ -1,0 +1,46 @@
+1. Install ts-node (if not installed already)
+npm install ts-node --save-dev
+npm install --save-dev @types/jest
+npm install jest
+npm install --save-dev @types/node @types/jest jest-worker @types/jest-worker
+npm install --save-dev @types/jest @types/node create-jest-runner
+npm install --save-dev jest ts-jest @types/jest
+
+2. Update the Jest Configuration to TypeScript
+Rename jest.config.js to jest.config.ts and update it as follows:
+
+import type { Config } from 'jest';
+
+const config: Config = {
+  projects: ['./other/jest.config.js', './other/jest.no-framework.config.js']
+};
+
+export default config;
+
+
+Generate a tsconfig.json: Run the following command in your project root to create a tsconfig.json file:
+npx tsc --init
+
+
+Add Jest Types to tsconfig.json: Open the newly created tsconfig.json file and make sure it includes Jest types by adding "jest" to the "types" array under "compilerOptions". Here’s an example of what it should look like:
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": ["jest"]  // Add this line to include Jest types
+  }
+}
+
+
+
+Configure Jest in TypeScript: If your TypeScript configuration (tsconfig.json) doesn’t recognize Jest types, ensure that the "types" array includes "jest". For example:
+{
+  "compilerOptions": {
+    "types": ["jest"],
+    // Other compiler options...
+  }
+}
