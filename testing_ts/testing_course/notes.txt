@@ -193,3 +193,977 @@ expect(throwError).toThrow("Something went wrong");
 // Use these with promises to ensure they resolve or reject as expected.
 await expect(Promise.resolve("value")).resolves.toBe("value");
 await expect(Promise.reject("error")).rejects.toBe("error");
+
+
+
+//multiple test structures 
+//each test should be independent of other tests 
+ //multiple test structure 
+    describe('getStringInfo for args My-String should', () => {
+        test('return right length', () => {
+            const actual = getStringInfo('My-String')
+            expect(actual.characters).toHaveLength(9)
+        })
+
+        test('return lower case', () => {
+            const actual = getStringInfo('My-String')
+            expect(actual.lowerCase).toBe('my-string')
+        })
+
+        test('return upper case', () => {
+            const actual = getStringInfo('My-String')
+            expect(actual.upperCase).toBe('MY-STRING')
+        })
+
+
+        test('return right characters', () => {
+            const actual = getStringInfo('My-String')
+            expect(actual.characters).toEqual(
+                expect.arrayContaining(['S', 't', 'r', 'i', 'n', 'g', 'M', 'y', '-'])
+            )
+        })
+
+        test('return defined extra  info', () => {
+            const actual = getStringInfo('My-String')
+            // expect(actual.extraInfo).toBe({})
+            expect(actual.extraInfo).toEqual({})
+            // Assertion that extraInfo should not be undefined
+            expect(actual.extraInfo).not.toBe(undefined);
+            // This checks that actual.extraInfo is not undefined, meaning it has been assigned some value.
+            // Useful when ensuring that a value is present.
+
+            // Check that extraInfo is not undefined
+            expect(actual.extraInfo).not.toBeUndefined();        // This assertion checks that actual.extraInfo is exactly undefined.
+            // It may conflict with the previous line if extraInfo should always have a value.
+
+            expect(actual.extraInfo).toBeDefined();
+            // Checks that actual.extraInfo has been defined. It’s the opposite of .toBeUndefined(),
+            // and will pass if actual.extraInfo is anything other than undefined.
+
+            expect(actual.extraInfo).toBeTruthy();
+            // Checks that actual.extraInfo is "truthy," meaning it is neither null, undefined, false, 0, NaN, nor an empty string.
+            // If extraInfo is an object or non-empty value, this will pass.
+
+
+        })
+    })
+
+
+
+//parameterized tests 
+Parameterized tests are a powerful feature in unit testing that allows you to run the same test with multiple sets of input data, making test cases more concise and efficient—particularly useful in a complex suite. This approach is highly compatible with the Arrange-Act-Assert (AAA) pattern, enhancing readability and maintainability of the suite.
+
+Here’s how you might rewrite your example to be parameterized with a library like jest.each, using the AAA structure:
+
+// Import or define the function to test
+const toUpperCase = str => str.toUpperCase();
+
+// Parameterized test cases using AAA pattern
+describe('toUpperCase', () => {
+    it.each([
+        ['abc', 'ABC'],
+        ['hello', 'HELLO'],
+        ['Test', 'TEST'],
+        ['', ''],  // Edge case: empty string
+        ['123', '123'] // Numeric string case
+    ])('should return uppercase of the input string "%s"', (input, expected) => {
+        // Arrange: Prepare the function to test and input/output expectations
+        const sut = toUpperCase;
+        
+        // Act: Call the function with the test input
+        const result = sut(input);
+        
+        // Assert: Verify the output matches the expected result
+        expect(result).toBe(expected);
+    });
+});
+
+
+
+
+Intermediate testing topics
+F.I.R.S.T. principlesj
+jest hooks - how to structure test
+test for errorsjest alies
+debugging
+coverage
+
+
+F.I.R.S.T. principles
+Principles not rules that we may follow when writing tests 
+- fast
+- independent
+- Repeatable 
+- Self-validating 
+- Thorough
+
+The F.I.R.S.T. principles are guidelines to make test suites more effective, reliable, and maintainable. While they're principles rather than strict rules, following them can improve the quality of your tests and the feedback loop in development.
+
+Here’s a breakdown of each principle:
+
+1. Fast
+Goal: Tests should run quickly.
+Explanation: Fast tests provide immediate feedback, which is essential in continuous development and testing. When tests are fast, developers are more likely to run them frequently, improving productivity and catching bugs early. Long-running tests can discourage regular testing and slow down development.
+Best Practices:
+Avoid making network requests or accessing databases unless necessary.
+Use mocks and stubs to simulate interactions with external systems.
+Run only the required subset of tests when possible (e.g., unit tests vs. full integration tests).
+
+2. Independent
+Goal: Each test should be able to run on its own, without depending on others.
+Explanation: Independent tests help ensure that tests don’t influence each other. If tests are interdependent, a failure in one could cause cascading failures in others, making it harder to identify the root cause and reducing reliability.
+Best Practices:
+Each test should set up its own context and data, so it doesn't rely on the state created by previous tests.
+Avoid shared state or variables across tests. If shared data is necessary, reset it at the start or end of each test.
+
+3. Repeatable
+Goal: Tests should yield the same results every time they run.
+Explanation: Tests that produce inconsistent results are unreliable and can erode confidence in the test suite. Repeatable tests ensure consistency across different environments, runs, and developers.
+Best Practices:
+Avoid external dependencies that could vary, such as network conditions, time-based functions, or random values.
+Use mocks or fixed values in place of dynamic data sources.
+For date/time-based tests, consider "freezing" time so tests can operate on a consistent time context.
+Eg. tests that write to a db 
+ - should always clean up
+  - In contradiction with Fats Principle. It has to do more setup and tear down operations  
+
+4. Self-Validating
+Goal: Tests should have a clear pass or fail result.
+Explanation: A self-validating test automatically verifies the outcome without requiring manual inspection. This makes it easy to see which tests passed and which failed, allowing faster debugging.
+Best Practices:
+Use assertions to explicitly check the outcomes.
+Avoid tests that print values for manual inspection. Instead, compare expected and actual results with assertions to validate behavior.
+Ensure test results are clearly communicated to avoid ambiguous outcomes. sa
+
+5. Thorough
+Goal: Tests should cover all critical aspects of the code.
+Explanation: Thorough tests verify that the code works under a variety of conditions and edge cases. A test suite that is thorough will give confidence that the code is reliable and robust.
+Best Practices:
+Aim for high code coverage, but focus on meaningful coverage that covers different branches, edge cases, and potential failure points.
+Use boundary testing, stress testing, and edge case scenarios.
+Avoid testing trivial code that doesn’t add value, and instead focus on parts of the codebase where bugs are more likely.
+
+Example in Code Using F.I.R.S.T.
+it('should return the uppercase version of a string', () => {
+    // Arrange - Set up initial data
+    const input = 'hello';
+    const expectedOutput = 'HELLO';
+
+    // Act - Call the function being tested
+    const result = toUpperCase(input);
+
+    // Assert - Check the result
+    expect(result).toBe(expectedOutput);
+});
+
+
+
+JEST Hooks
+ - AAA principles
+ - setup and teardown 
+ - Tests should be independent 
+ - Reduce code duplication
+
+
+ Jest Hooks: An Overview
+Jest provides several hooks to set up and manage test environments, which help in organizing tests and reducing redundancy. These hooks are essential for structuring tests according to the AAA (Arrange-Act-Assert) principle, performing setup and teardown tasks, ensuring independent tests, and reducing code duplication.
+
+Key Jest Hooks:
+beforeAll: Runs once before all tests in a test suite. Ideal for expensive setup tasks that only need to be done once.
+beforeEach: Runs before each test in a suite, allowing for fresh setup specific to each test.
+afterEach: Runs after each test, usually to clean up or reset any state.
+afterAll: Runs once after all tests in the suite are completed, generally for cleanup tasks.
+How Jest Hooks Apply to Testing Principles
+1. AAA Principles (Arrange-Act-Assert)
+AAA is a common testing approach to keep test cases clear and readable by structuring them into three phases:
+Arrange: Set up any initial data, state, or mocks needed for the test.
+Act: Execute the function or action being tested.
+Assert: Verify that the results are as expected.
+Jest hooks help with the Arrange phase, by enabling reusable setup code that doesn't have to be written repeatedly in each test case.
+Example Using AAA and Jest Hooks:
+
+javascript
+Copy code
+let user;
+
+beforeEach(() => {
+    // Arrange: Create a new user object before each test
+    user = { name: 'Alice', age: 25 };
+});
+
+test('should update user age correctly', () => {
+    // Act: Update the user age
+    user.age = 30;
+
+    // Assert: Verify the age was updated
+    expect(user.age).toBe(30);
+});
+2. Setup and Teardown
+Setup refers to preparing the test environment, such as initializing variables, mocking APIs, or connecting to a database.
+Teardown is the cleanup that happens after each test, such as closing connections or clearing mocks.
+Jest’s beforeAll, beforeEach, afterEach, and afterAll hooks make it easy to set up and tear down, which helps avoid resource leakage and ensures a clean state for each test.
+Example of Setup and Teardown:
+
+javascript
+Copy code
+beforeAll(() => {
+    // Setup database connection before all tests
+    connectToDatabase();
+});
+
+afterAll(() => {
+    // Teardown: Close database connection after all tests
+    closeDatabaseConnection();
+});
+
+beforeEach(() => {
+    // Setup: Create mock data before each test
+    populateMockData();
+});
+
+afterEach(() => {
+    // Teardown: Clear mock data after each test
+    clearMockData();
+});
+3. Tests Should Be Independent
+Each test should not rely on the result or state of other tests. Independent tests make it easier to isolate failures and ensure that one test doesn’t cause cascading failures in others.
+beforeEach and afterEach are especially useful for ensuring independence by resetting the state before and after each test.
+Independent tests allow the suite to run in any order, whether sequentially or in parallel, without interference.
+Example of Independent Tests:
+
+javascript
+Copy code
+beforeEach(() => {
+    // Reset data or mock instances before each test
+    resetTestEnvironment();
+});
+
+test('should add an item to the list', () => {
+    addItem('apple');
+    expect(getItems()).toContain('apple');
+});
+
+test('should remove an item from the list', () => {
+    addItem('banana');
+    removeItem('banana');
+    expect(getItems()).not.toContain('banana');
+});
+In this example, beforeEach ensures each test has a clean environment, so tests for adding and removing items don’t interfere with each other.
+
+4. Reduce Code Duplication
+Repetitive setup or teardown code can clutter tests and make them harder to maintain. Using Jest hooks reduces duplication by centralizing setup and teardown code that multiple tests might share.
+This approach keeps each test case focused on its specific Act and Assert steps, without redundant setup/teardown logic.
+Example to Reduce Code Duplication:
+
+javascript
+Copy code
+beforeEach(() => {
+    // Set up reusable test data
+    initializeUserDatabase();
+    createMockSession();
+});
+
+test('should authenticate user', () => {
+    const user = authenticate('user1', 'password1');
+    expect(user.isAuthenticated).toBe(true);
+});
+
+test('should fail for invalid credentials', () => {
+    const user = authenticate('user1', 'wrongpassword');
+    expect(user.isAuthenticated).toBe(false);
+});
+Here, beforeEach avoids duplicating database initialization and session creation, keeping each test case focused and easier to read.
+
+Summary
+By utilizing Jest hooks in line with the AAA approach, setup and teardown, independent tests, and code duplication reduction, you can create well-structured, maintainable test suites. Each test will run in a clean, consistent environment, and the suite will be efficient and resilient, giving reliable feedback on code functionality.
+
+
+//Testing for errors 
+1. Using assert.throws (Node.js Assertion Style)
+If you're working in a Node.js environment and want to use assert from the standard library, this can be an alternative approach.
+const assert = require('assert');
+
+it('should throw error on invalid argument - function 4', () => {
+    assert.throws(
+        () => sut.toUpperCase(''),
+        {
+            name: 'Error',
+            message: 'Invalid argument',
+        }
+    );
+});
+
+
+2. Checking Error Message with Regex
+If you want a flexible match for the error message (for example, checking only a part of the message or ignoring case), you can use a regular expression with toThrowError.
+it('should throw error on invalid argument - function 5', () => {
+    expect(() => sut.toUpperCase('')).toThrowError(/invalid argument/i); // Case-insensitive match
+});
+
+
+3. Using async/await for Asynchronous Functions
+If the function you're testing is asynchronous and might throw an error, you can use async/await along with expect and rejects in Jest. This example is useful if you convert toUpperCase to return a Promise.
+it('should throw error on invalid argument - function 6 (async)', async () => {
+    await expect(async () => {
+        await sut.toUpperCase('');
+    }).rejects.toThrowError('Invalid argument');
+});
+
+
+
+4. Checking Custom Properties on Errors
+If your error object has custom properties, you can check those as well. For example, if you had an error with a custom code property, you could extend the previous examples like this:
+class CustomError extends Error {
+    constructor(message: string, public code: number) {
+        super(message);
+    }
+}
+
+export class StringUtils {
+    public toUpperCase(arg: string) {
+        if (!arg) {
+            throw new CustomError("Invalid argument", 400);
+        }
+        return arg.toUpperCase();
+    }
+}
+
+// Test
+it('should throw custom error with specific code', () => {
+    try {
+        sut.toUpperCase('');
+    } catch (error) {
+        expect(error).toBeInstanceOf(CustomError);
+        expect(error).toHaveProperty('message', 'Invalid argument');
+        expect(error).toHaveProperty('code', 400);
+    }
+});
+
+
+
+5. Using jest.spyOn to Observe Error Logging
+If your code logs an error message instead of throwing an error, you can use jest.spyOn to ensure the log method was called. This method is useful if you want to test error-handling behavior without actually throwing an error.
+it('should log error on invalid argument', () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+    
+    sut.toUpperCase('');  // Assuming it logs an error instead of throwing one
+
+    expect(consoleSpy).toHaveBeenCalledWith('Invalid argument');
+    
+    consoleSpy.mockRestore();
+});
+
+
+jest aliase
+Jest provides several properties and methods to control test behavior, which can help in organizing and optimizing test suites. Here’s a breakdown of some of the most useful Jest properties, aliases, and modes:
+
+1. .skip and .only
+These properties allow you to selectively run or skip tests, which is helpful during development or debugging.
+
+.skip: Use .skip to temporarily ignore a test. Jest will report the test as "skipped" without running it.
+it.skip('should not run this test', () => {
+    expect(true).toBe(false);
+});
+
+.only: Use .only to run a specific test or test suite and ignore all others. This is useful when focusing on one test that you need to debug.\
+it.only('should run only this test', () => {
+    expect(true).toBe(true);
+});
+
+You can also use .only with describe to limit the entire test suite.
+describe.only('Focused test suite', () => {
+    it('runs this test', () => {
+        expect(true).toBe(true);
+    });
+});
+
+
+xit - is an alias of it.skip
+fit - is an alias for it.only
+
+
+2. .todo
+.todo is a shorthand to mark a test as "to be implemented." This allows you to outline test cases without providing an implementation. Jest will mark them as pending.
+it.todo('should throw an error on invalid input');
+good for test driven development 
+
+3. Aliases: it, test, and describe
+Jest provides a few aliases that make the test suite more readable and expressive.
+
+it and test: These two are interchangeable and can be used to define test cases. Use whichever makes your tests more readable or consistent with your naming conventions
+it('should work with it', () => {
+    expect(true).toBe(true);
+});
+
+test('should work with test', () => {
+    expect(true).toBe(true);
+});
+
+describe: Groups tests together in a test suite. This helps to organize related tests, especially when they share setup or teardown logic.
+describe('String manipulation functions', () => {
+    it('should convert to uppercase', () => {
+        expect('abc'.toUpperCase()).toBe('ABC');
+    });
+    it('should convert to lowercase', () => {
+        expect('ABC'.toLowerCase()).toBe('abc');
+    });
+});
+
+
+In Jest, .concurrent is a feature that allows you to run tests in parallel (concurrently), which can significantly reduce the time it takes to run a test suite, especially for async functions. Running tests concurrently is helpful when tests are independent and do not rely on shared resources or modify shared state.
+
+Here's how .concurrent works and when you might want to use it:
+
+1. Using .concurrent in Jest
+By default, Jest runs tests sequentially, one after another. When you add .concurrent to a test or group of tests, Jest will execute them simultaneously, potentially speeding up the overall execution time.
+
+it.concurrent('should fetch data from API 1', async () => {
+    const data = await fetchDataFromApi1();
+    expect(data).toBeDefined();
+});
+
+it.concurrent('should fetch data from API 2', async () => {
+    const data = await fetchDataFromApi2();
+    expect(data).toBeDefined();
+});
+
+it.concurrent('should fetch data from API 3', async () => {
+    const data = await fetchDataFromApi3();
+    expect(data).toBeDefined();
+});
+
+
+2. When to Use .concurrent
+.concurrent is useful when:
+
+Tests involve asynchronous operations: If your tests make API calls, database queries, or any I/O-bound operations, .concurrent can help reduce the wait time by running them in parallel.
+Tests are independent: Tests should not depend on or modify shared state, such as a global variable or a shared database record, since concurrent tests might interfere with each other and cause flaky results.
+You want to speed up the test suite: When you have multiple time-consuming async tests, .concurrent can significantly reduce the total test execution time.
+3. Important Considerations
+While .concurrent can improve test performance, there are some things to keep in mind:
+
+Avoid shared state: Any shared state between tests could lead to race conditions, making test outcomes unreliable.
+Error handling: If a test fails while running concurrently, Jest will still report the error, but it might be harder to debug if the tests affect each other.
+Limited to async functions: .concurrent is intended for async functions, as it waits for all promises to resolve before Jest finishes.
+
+4. Grouping Tests Concurrently
+You can also use .concurrent with it.each for running parameterized tests concurrently:
+it.concurrent.each([
+    ['data1'],
+    ['data2'],
+    ['data3']
+])('should fetch %s from API', async (data) => {
+    const result = await fetchDataFromApi(data);
+    expect(result).toBeDefined();
+});
+
+
+5. Mixing .concurrent with Other Properties
+You can mix .concurrent with .only or .skip to control which concurrent tests are executed:
+it.concurrent.only('should run this test concurrently and ignore others', async () => {
+    const data = await fetchData();
+    expect(data).toBeDefined();
+});
+
+
+6. Practical Example with beforeEach
+If your test suite has shared setup logic, you should ensure that the setup does not interfere with concurrent tests. For example:
+let db;
+
+beforeEach(() => {
+    db = new DatabaseConnection();
+});
+
+it.concurrent('test 1', async () => {
+    const data = await db.query('SELECT * FROM table');
+    expect(data).toBeDefined();
+});
+
+it.concurrent('test 2', async () => {
+    const data = await db.query('SELECT * FROM another_table');
+    expect(data).toBeDefined();
+});
+
+
+4. Jest Watch Mode
+Watch mode allows you to run tests automatically based on file changes, providing faster feedback during development. This mode can be activated by running Jest with the --watch flag:
+jest --watch
+
+Some key features in watch mode:
+
+Press p to filter by file name.
+Press t to filter by test name.
+Press q to quit watch mode.
+Press a to run all tests.
+Press f to run only failed tests from the previous run.
+Watch mode is especially useful for large codebases, as it minimizes the number of tests that need to run each time you make changes.
+
+5. .each for Parameterized Tests
+.each allows you to run the same test with different parameters, which is helpful for testing functions with multiple inputs.
+
+
+
+debugging with vs code with unit tests 
+https://github.com/microsoft/vscode-recipes/tree/main/debugging-jest-tests
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Jest Current File",
+            "program": "${workspaceFolder}/node_modules/.bin/jest",
+            "args": [
+              "--runTestsByPath",
+              "${relativeFile}",
+              "--config",
+              "jest.config.ts"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "disableOptimisticBPs": true,
+            "windows": {
+            }
+        }
+    ]
+}
+
+also while debugging, use it.only to debug the right thing 
+example, just run describe.only and inside that describerun on the test you need it.only 
+add break points now  
+go back to run and debug section 
+now open the file where you put breakpoints and hit play 
+
+
+use run and debug on the menu of vs-code
+
+choose laaunch json file and put the config  
+
+
+
+//only use code coverage once done with your test implementatinon
+coverage --adding coverag on config jset , bu does not work well with watch on package json 
+this adds a coverage report 
+/** @type {import('ts-jest').JestConfigWithTsJest} **/
+module.exports = {
+  testEnvironment: "node",
+  transform: {
+    "^.+.tsx?$": ["ts-jest",{}],
+  },
+  verbose: true,
+  collectCoverage: true,
+  collectCoverageFrom: [
+    '<tootDir>/src/app/**/*.ts'
+  ]
+};
+
+you can check the coverage better inside the coverage folder  
+{
+  "scripts": {
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "test:watch": "jest --watch"
+  }
+}
+
+
+
+istanbul ignore package to remove specific part of your code from coverage
+/*istanbul ignore next*/
+export function getStringInfo(arg: string) : stringinfo {
+    return {
+        lowerCase: arg.toLowerCase(),
+        upperCase: arg.toUpperCase(),
+        characters: Array.from(arg),
+        length: arg.length,
+        extraInfo: {}
+    }
+}
+
+
+
+TEST DRIVEN DEVELOPMENT WITH JEST
+Test-Driven Development (TDD) is a software development approach where you write automated tests before writing the actual code. This process involves a cyclical approach often referred to as the "Red-Green-Refactor" cycle:   
+
+Red: Write a test for a specific feature or functionality. This test will initially fail because the code to implement the feature hasn't been written yet.   
+Green: Write the minimum amount of code necessary to make the test pass. This code should be focused on making the test pass, without worrying about code quality or design at this stage.   
+Refactor: Improve the code's design and structure without changing its behavior. This ensures that the code is clean, maintainable, and efficient.   
+Benefits of TDD:
+
+Improved Code Quality: TDD encourages writing clean, well-structured, and maintainable code.   
+Increased Test Coverage: By writing tests before the code, you ensure that all parts of your code are thoroughly tested.   
+Early Bug Detection: TDD helps identify and fix bugs early in the development process, reducing the cost of fixing them later.   
+Enhanced Design: TDD can lead to better software design by forcing you to think about the interface and behavior of your code before implementation.   
+Increased Confidence: TDD provides confidence in your code's correctness and reliability.   
+Key Principles of TDD:
+
+Test First: Always write a test before writing the corresponding code.   
+Write Small Tests: Focus on testing small, isolated units of code.   
+Refactor Regularly: Continuously improve the design and structure of your code.   
+Keep Tests Simple: Tests should be easy to understand and maintain.
+By following these principles, you can effectively use TDD to create high-quality, reliable software.
+
+Rewuirementts: 
+Iteration 1 : 
+ - A password is invalid if: 
+  . length is less than 8 characters
+  . has no upper case letter 
+  . has no lower case letter 
+
+- iteration two  - return the reasons for invalidit 
+- Iteration three: admin password should contain a number   
+
+
+Test doubles in JEST - for more complicated code  
+- WHAT THEY ARE AND WHY DO WE NEED THEM 
+- How we can use different types of test doubles in jest and Typoescript  
+  . stubs - incomplete objects used as arguments
+  . Fakes - simplified working implementation , take a shortcut eg fake user service 
+  . mocks - preprogrammed with expectations 
+  .spices - track information about how a unit is called 
+  . Dummy - passws around but not used 
+
+  mocks and spies have a lot of commons  
+  If one nee
+
+
+  What we did earlier can be considered test stubs or test scaffolding. Here's what that means and why it's useful:
+
+What are Test Stubs?
+Test stubs are pieces of code used in testing to stand in for parts of the application that have not been implemented yet or are incomplete. They allow developers to create a basic test structure and simulate responses for components, functions, or modules to ensure that the rest of the code behaves as expected when interacting with those stubs.
+
+How Did We Use Stubs?
+In our case, we:
+
+Defined a basic structure for tests using Jest's describe and it blocks.
+Created simple test cases with mock data to check how a function (calculateComplexity) behaves under certain conditions.
+Used mock data and expected outputs without connecting to complex real-world components or external dependencies.
+Why Use Test Stubs?
+Early Feedback: Helps get early feedback on the function's behavior before full implementation.
+Testing Logic in Isolation: Allows testing of the function's logic without integrating it with other parts of the codebase.
+Supports TDD (Test-Driven Development): You can write your test cases before implementing the full logic, which drives development.
+Next Steps After Stubs:
+Expand Tests: Add more comprehensive tests that cover edge cases and various scenarios.
+Replace Stubs with Actual Implementations: Once the actual code is written, replace the stub responses with real data or full function calls.
+Refine Tests: Modify and enhance tests to match the behavior of the complete implementation, ensuring accuracy and reliability.
+Stubs are great for outlining and starting test-driven development (TDD) since they help guide the development process and keep your code testable from the start.
+
+
+export type StringInfo = {
+    lowerCase: string,
+    upperCase: string,
+    length: number,
+    characters: string[],
+    extraInfo?: Record<string, any> // Changed to a more precise type
+}
+
+export function calculateComplexity(stringInfo: StringInfo): number {
+    if (stringInfo.extraInfo && typeof stringInfo.extraInfo === 'object') {
+        return Object.keys(stringInfo.extraInfo).length * stringInfo.length;
+    }
+    return 0; // Return 0 or a default value if extraInfo is undefined
+}
+
+
+import { calculateComplexity, StringInfo } from "../../app/doubles/OtherUtils";
+
+describe('OtherUtils test suite', () => {
+    it('Calculates complexity correctly when extraInfo is provided', () => {
+        const someInfo: StringInfo = {
+            lowerCase: 'example',
+            upperCase: 'EXAMPLE',
+            length: 7,
+            characters: ['e', 'x', 'a', 'm', 'p', 'l', 'e'],
+            extraInfo: {
+                key1: 'value1',
+                key2: 'value2'
+            }
+        };
+
+        const complexity = calculateComplexity(someInfo);
+        expect(complexity).toBe(14); // 2 keys * length 7 = 14
+    });
+
+    it('Calculates complexity as 0 when extraInfo is undefined', () => {
+        const someInfo: StringInfo = {
+            lowerCase: 'test',
+            upperCase: 'TEST',
+            length: 4,
+            characters: ['t', 'e', 's', 't'],
+            extraInfo: undefined // No additional information
+        };
+
+        const complexity = calculateComplexity(someInfo);
+        expect(complexity).toBe(0); // Should return 0 when extraInfo is undefined
+    });
+});
+    
+
+
+Creating a fake user service can be a powerful way to simulate a real-world service without interacting with a live database or external API. This can be useful for developing, testing, or learning purposes. Here’s how you can create a fake user service in a step-by-step manner.
+
+Step 1: Define the User Type
+Create a User type or interface that describes the structure of a user object.
+
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  age: number;
+}
+
+
+export const fakeUsers: User[] = [
+  { id: 1, name: "Alice", email: "alice@example.com", age: 25 },
+  { id: 2, name: "Bob", email: "bob@example.com", age: 30 },
+  { id: 3, name: "Charlie", email: "charlie@example.com", age: 35 },
+];
+
+
+Step 3: Implement the Fake User Service
+Create a service that simulates common operations like fetching users, adding a user, and deleting a user.
+
+export class FakeUserService {
+  private users: User[] = fakeUsers;
+
+  getAllUsers(): User[] {
+    return this.users;
+  }
+
+  getUserById(id: number): User | undefined {
+    return this.users.find(user => user.id === id);
+  }
+
+  addUser(newUser: User): User {
+    this.users.push(newUser);
+    return newUser;
+  }
+
+  deleteUser(id: number): boolean {
+    const userIndex = this.users.findIndex(user => user.id === id);
+    if (userIndex !== -1) {
+      this.users.splice(userIndex, 1);
+      return true;
+    }
+    return false;
+  }
+}
+
+Create test cases to ensure the service behaves as expected.
+import { FakeUserService, fakeUsers, User } from './FakeUserService';
+
+describe('FakeUserService test suite', () => {
+  let userService: FakeUserService;
+
+  beforeEach(() => {
+    userService = new FakeUserService();
+  });
+
+  it('should return all users', () => {
+    const users = userService.getAllUsers();
+    expect(users).toEqual(fakeUsers);
+    expect(users.length).toBe(3);
+  });
+
+  it('should return a user by ID', () => {
+    const user = userService.getUserById(1);
+    expect(user).toBeDefined();
+    expect(user?.name).toBe("Alice");
+  });
+
+  it('should add a new user', () => {
+    const newUser: User = { id: 4, name: "Dave", email: "dave@example.com", age: 40 };
+    const addedUser = userService.addUser(newUser);
+    expect(addedUser).toEqual(newUser);
+    expect(userService.getAllUsers().length).toBe(4);
+  });
+
+  it('should delete a user by ID', () => {
+    const isDeleted = userService.deleteUser(2);
+    expect(isDeleted).toBe(true);
+    expect(userService.getAllUsers().length).toBe(2);
+  });
+
+  it('should not delete a non-existing user', () => {
+    const isDeleted = userService.deleteUser(999);
+    expect(isDeleted).toBe(false);
+    expect(userService.getAllUsers().length).toBe(3);
+  });
+});
+
+
+Learning about mocks can be very powerful when writing unit tests for real-world applications. While fakes are used to create simpler implementations, mocks are more versatile and provide ways to:
+
+Simulate specific behavior of objects or functions.
+Track calls to these objects or functions.
+Verify that certain methods were called with expected arguments.
+Example Scenario: Mocking an External Service in a User Management App
+Consider a user management application that interacts with an external email service to send a welcome email after a user is added. To test this app, we don't want to actually send emails during tests; instead, we can mock the email service.
+
+Step-by-Step Guide to Using Mocks
+Identify External Dependencies: Recognize functions or services your code relies on, such as APIs, databases, or third-party services.
+
+Set Up a Test Suite: Define a structure that includes setup and teardown logic if necessary.
+
+Use a Mocking Library: Utilize tools like Jest to create mocks. Jest has built-in support for mocking functions and modules.
+
+Example Code for Mocking
+Scenario: Adding a User and Sending a Welcome Email
+Service Code (UserService.ts):
+import { EmailService } from './EmailService';
+
+export class UserService {
+  private emailService: EmailService;
+
+  constructor(emailService: EmailService) {
+    this.emailService = emailService;
+  }
+
+  addUser(user: { name: string, email: string }): boolean {
+    // Logic to add user to the database (not shown)
+    const isAdded = true; // Assume the user is added successfully
+    if (isAdded) {
+      this.emailService.sendWelcomeEmail(user.email);
+    }
+    return isAdded;
+  }
+}
+
+
+Email Service Code (EmailService.ts):
+export class EmailService {
+  sendWelcomeEmail(email: string): void {
+    // Actual logic to send an email (e.g., using an external SMTP service)
+    console.log(`Sending welcome email to ${email}`);
+  }
+}
+
+
+Writing Tests with Mocks
+Test Code (UserService.test.ts):
+import { UserService } from './UserService';
+import { EmailService } from './EmailService';
+
+// Use Jest to mock the EmailService
+jest.mock('./EmailService');
+
+describe('UserService test suite', () => {
+  let userService: UserService;
+  let emailServiceMock: jest.Mocked<EmailService>;
+
+  beforeEach(() => {
+    // Create a mock instance of EmailService
+    emailServiceMock = new EmailService() as jest.Mocked<EmailService>;
+    userService = new UserService(emailServiceMock);
+  });
+
+  it('should add a user and send a welcome email', () => {
+    // Arrange
+    emailServiceMock.sendWelcomeEmail.mockImplementation(() => {
+      console.log('Mocked sendWelcomeEmail called');
+    });
+
+    // Act
+    const result = userService.addUser({ name: 'John Doe', email: 'john.doe@example.com' });
+
+    // Assert
+    expect(result).toBe(true);
+    expect(emailServiceMock.sendWelcomeEmail).toHaveBeenCalledTimes(1);
+    expect(emailServiceMock.sendWelcomeEmail).toHaveBeenCalledWith('john.doe@example.com');
+  });
+
+  it('should not send an email if user is not added', () => {
+    // Override addUser logic to simulate failure
+    jest.spyOn(userService, 'addUser').mockImplementation(() => false);
+
+    const result = userService.addUser({ name: 'Jane Doe', email: 'jane.doe@example.com' });
+
+    expect(result).toBe(false);
+    expect(emailServiceMock.sendWelcomeEmail).not.toHaveBeenCalled();
+  });
+});
+
+
+
+Spies are another essential part of testing, allowing you to monitor calls to a function without changing its implementation. Spies are useful for tracking how functions are called, what arguments they receive, and how often they are invoked. They are especially beneficial when you want to verify that internal methods or dependencies are used as expected without altering their behavior.
+
+Differences Between Spies and Mocks:
+Spies only track and observe the function's behavior without changing it.
+Mocks replace the function's implementation, allowing for controlled, fake responses.
+Real-World Example Using Spies
+Imagine you have a logging service that logs various levels of messages (info, warn, error). You want to test that your UserService logs an error message when an operation fails.
+
+spies are not directly injected into sut
+Original functionality is preserved with spies 
+spies usually track method calls  
+
+Logging Service Code (LoggerService.ts):
+export class LoggerService {
+  logInfo(message: string): void {
+    console.log(`INFO: ${message}`);
+  }
+
+  logError(message: string): void {
+    console.error(`ERROR: ${message}`);
+  }
+}
+
+
+User Service Code (UserService.ts):
+import { LoggerService } from './LoggerService';
+
+export class UserService {
+  private logger: LoggerService;
+
+  constructor(logger: LoggerService) {
+    this.logger = logger;
+  }
+
+  deleteUser(userId: number): boolean {
+    try {
+      // Simulate user deletion logic
+      if (userId <= 0) throw new Error('Invalid user ID');
+      console.log(`User with ID ${userId} deleted.`);
+      return true;
+    } catch (error) {
+      this.logger.logError(`Failed to delete user: ${error.message}`);
+      return false;
+    }
+  }
+}
+
+
+Writing Tests with Spies
+Test Code (UserService.test.ts):
+import { UserService } from './UserService';
+import { LoggerService } from './LoggerService';
+
+describe('UserService with spies', () => {
+  let userService: UserService;
+  let loggerService: LoggerService;
+
+  beforeEach(() => {
+    loggerService = new LoggerService();
+    userService = new UserService(loggerService);
+  });
+
+  it('should log an error when deleteUser fails', () => {
+    // Spy on the logError method of LoggerService
+    const logErrorSpy = jest.spyOn(loggerService, 'logError');
+
+    // Act: Call deleteUser with an invalid ID to trigger an error
+    const result = userService.deleteUser(-1);
+
+    // Assert: Verify that deleteUser returned false
+    expect(result).toBe(false);
+    // Assert: Verify that logError was called once with the expected message
+    expect(logErrorSpy).toHaveBeenCalledTimes(1);
+    expect(logErrorSpy).toHaveBeenCalledWith('Failed to delete user: Invalid user ID');
+
+    // Clean up the spy to avoid side effects in other tests
+    logErrorSpy.mockRestore();
+  });
+});

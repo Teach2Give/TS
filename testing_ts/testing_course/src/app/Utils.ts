@@ -1,3 +1,13 @@
+export class StringUtils {
+    public toUpperCase(arg: string) {
+        //this is used to check error after learning jest hooks
+        if(!arg) {
+            throw new Error("Invalid argument")
+        }
+        return  arg.toUpperCase();
+    }
+}
+
 export function toUpperCase(arg: string) {
     return arg.toUpperCase()
 }
